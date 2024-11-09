@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard del Consumidor{% endblock %}
+
+{% block content %}
+
+<style>
+    #consumer-menu {
+    border-right: 1px solid #ccc;
+    height: 100vh;
+}
+
+#main-content {
+    padding: 20px;
+}
+</style>
+
+<div class="container-fluid mt-5">
+    <div class="row">
+        <!-- Aside -->
+        <aside class="col-md-3 bg-light p-3" id="consumer-menu">
+            <h4>Menú</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" onclick="loadSection('profile')">Perfil</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="loadSection('cases')">Casos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="loadSection('new-case')">Nuevo Caso</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="loadSection('updates')">Actualizaciones</a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="col-md-9" id="main-content">
+            <h2>Bienvenido, Consumidor</h2>
+            <p>Selecciona una opción del menú para ver o gestionar tu información.</p>
+        </main>
+    </div>
+    <script>
+        const usuario = {
+            first_name: "{{ usuario.first_name }}",
+            email: "{{ usuario.email }}",
+            username: "{{ usuario.username }}",
+        };
+    </script>
+    
+</div>
+
+{% endblock %}

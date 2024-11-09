@@ -1,0 +1,240 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Registrar Nuevo Caso</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+    <div class="container mt-5">
+        <h2>Registrar Nuevo Caso</h2>
+
+        <!-- Pantalla 1: Selección de clase de conflicto -->
+        <div id="part1" class="form-part">
+            <h3>Seleccione una opción para continuar</h3>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="conflictType" id="conflict1" value="problema_compra" required>
+                <label class="form-check-label" for="conflict1">
+                    <img src="{% static 'images/problema_compra.png' %}" alt="Problema Compra" class="img-thumbnail"> Tuve un problema durante el proceso de compra.
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="conflictType" id="conflict2" value="problema_entrega" required>
+                <label class="form-check-label" for="conflict2">
+                    <img src="{% static 'images/problema_entrega.png' %}" alt="Problema Entrega" class="img-thumbnail"> Tengo un problema con la entrega.
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="conflictType" id="conflict3" value="problema_producto" required>
+                <label class="form-check-label" for="conflict3">
+                    <img src="{% static 'images/problema_producto.png' %}" alt="Problema Producto" class="img-thumbnail"> Tengo un problema con el producto.
+                </label>
+            </div>
+            <button id="continueButton" class="btn btn-primary mt-3">Continuar</button>
+        </div>
+
+        <!-- Pantalla 2: Detalles del conflicto -->
+        <div id="part2" class="form-part">
+            <h3>Detalles del Conflicto</h3>
+
+            <!-- Sección 1: Alternativas (Obligatorio) -->
+            <div class="mb-3">
+                <label>¿Qué sucedió exactamente?</label>
+                <select class="form-select" required>
+                    <option value="defectuoso">El producto llegó defectuoso</option>
+                    <option value="sin_entrega">No se realizó la entrega</option>
+                    <option value="no_prometido">El servicio no fue el prometido</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label>¿De qué tamaño es el producto?</label>
+                <select class="form-select" required>
+                    <option value="muy_grande">Muy Grande</option>
+                    <option value="grande">Grande</option>
+                    <option value="mediano">Mediano</option>
+                    <option value="chico">Chico</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label>¿Cuáles fueron las condiciones de compra?</label>
+                <select class="form-select" required>
+                    <option value="oferta">Compré con una oferta/promoción</option>
+                    <option value="precio_normal">Compré a precio normal</option>
+                    <option value="no_sabe">No estoy seguro</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label>¿Has recibido alguna respuesta de la tienda?</label>
+                <select class="form-select" required>
+                    <option value="solucion_satisfactoria">Sí, solución satisfactoria</option>
+                    <option value="respuesta_insatisfactoria">Sí, respuesta insatisfactoria</option>
+                    <option value="no_respuesta">No, no he recibido respuesta</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label>¿Cuál es tu expectativa de resolución?</label>
+                <select class="form-select" required>
+                    <option value="reembolso">Reembolso completo</option>
+                    <option value="reemplazo">Reemplazo del producto</option>
+                    <option value="credito">Crédito en la tienda</option>
+                </select>
+            </div>
+
+            <!-- Sección 2: Información sobre la transacción -->
+            <h3>Información sobre la transacción</h3>
+
+            <div class="mb-3">
+                <label>Método de Adquisición</label>
+                <select class="form-select" required>
+                    <option value="online">Online</option>
+                    <option value="presencial">Presencial</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label>Fecha de compra</label>
+                <input type="date" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label>Nombre de la tienda</label>
+                <input type="text" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label>Número de Pedido</label>
+                <input type="text" class="form-control" required>
+            </div>
+
+            <!-- Sección 3: Acciones previas (Opcional) -->
+            <h3>Acciones previas</h3>
+
+            <div class="mb-3">
+                <label>¿Se comunicó con la tienda?</label>
+                <select class="form-select">
+                    <option value="si">Sí</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label>Fechas de contacto</label>
+                <input type="date" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label>Método de contacto</label>
+                <select class="form-select">
+                    <option value="presencial">Presencial</option>
+                    <option value="llamada">Llamada telefónica</option>
+                    <option value="correo">Correo electrónico</option>
+                    <option value="chat">Chat en línea</option>
+                </select>
+            </div>
+
+            <!-- Sección 4: Información adicional -->
+            <h3>Información adicional</h3>
+            <div class="mb-3">
+                <label>Detalles adicionales</label>
+                <textarea class="form-control" rows="3"></textarea>
+            </div>
+
+            <!-- Sección 5: Adjuntar documentos -->
+            <h3>Adjuntar documentos</h3>
+            <div class="mb-3">
+                <label>Adjuntar documentos o imágenes (máximo 2)</label>
+                <input type="file" class="form-control" multiple>
+            </div>
+
+            <button class="btn btn-secondary mt-3" onclick="prevPart(1)">Volver</button>
+            <button class="btn btn-primary mt-3" onclick="nextPart(3)">Continuar</button>
+        </div>
+
+        <!-- Pantalla 3: Retroalimentación de leyes -->
+        <div id="part3" class="form-part" style="display: none;">
+            <h3>Retroalimentación de leyes relacionadas</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <ul class="list-group">
+                        <!-- Simulación de lista de leyes -->
+                        <li class="list-group-item" onclick="showLaw(1)">Ley 1: Protección al consumidor</li>
+                        <li class="list-group-item" onclick="showLaw(2)">Ley 2: Garantía del producto</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <div id="lawDetails" class="border p-3">Selecciona una ley para ver detalles</div>
+                </div>
+            </div>
+            <button class="btn btn-secondary mt-3" onclick="prevPart(2)">Volver</button>
+            <button class="btn btn-primary mt-3" onclick="nextPart(4)">Continuar</button>
+        </div>
+
+        <!-- Pantalla 4: Predicción de resultados y casos relacionados -->
+        <div id="part4" class="form-part">
+            <h3>Predicción de los resultados y conclusiones</h3>
+            <div class="mb-3">
+                <label>Resultado de la predicción</label>
+                <textarea class="form-control" rows="3" placeholder="Resultado de la predicción generada por IA"></textarea>
+            </div>
+            <div class="mb-3">
+                <label>Recomendaciones</label>
+                <textarea class="form-control" rows="3" placeholder="Recomendaciones generadas por IA"></textarea>
+            </div>
+            <h3>Retroalimentación con casos relacionados</h3>
+            <ul class="list-group">
+                <li class="list-group-item">Caso relacionado 1</li>
+                <li class="list-group-item">Caso relacionado 2</li>
+            </ul>
+            <button class="btn btn-secondary mt-3" onclick="prevPart(3)">Volver</button>
+            <button class="btn btn-success mt-3" onclick="finalizeCase()">Finalizar y Guardar</button>
+        </div>
+
+        <script>
+            // Lógica para cambiar entre pantallas
+            document.getElementById('continueButton').addEventListener('click', function(event) {
+                event.preventDefault();
+                const selectedOption = document.querySelector('input[name="conflictType"]:checked');
+                if (selectedOption) {
+                    nextPart(2);
+                } else {
+                    alert("Por favor, seleccione una opción para continuar.");
+                }
+            });
+
+            function nextPart(part) {
+                document.querySelectorAll('.form-part').forEach(el => el.style.display = 'none');
+                document.getElementById(`part${part}`).style.display = 'block';
+            }
+
+            function prevPart(part) {
+                document.querySelectorAll('.form-part').forEach(el => el.style.display = 'none');
+                document.getElementById(`part${part}`).style.display = 'block';
+            }
+
+            function showLaw(lawId) {
+                const laws = {
+                    1: "Detalles de la Ley de Protección al Consumidor...",
+                    2: "Detalles de la Ley de Garantía del Producto..."
+                };
+                document.getElementById("lawDetails").innerText = laws[lawId] || "Ley no encontrada.";
+            }
+
+            function finalizeCase() {
+                alert("Caso registrado exitosamente.");
+                window.location.href = "/perfil";
+            }
+        </script>
+    </div>
+
+</body>
+</html>
