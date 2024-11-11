@@ -1,1 +1,1 @@
-# proyecto_asistencia_digital
+# proyecto_asistencia_judicial
