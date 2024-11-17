@@ -1,0 +1,14 @@
+# Archivos y carpetas generadas por Python
+*.pyc
+*.pyo
+__pycache__/
+
+# Migraciones de Django
+*/migrations/*.py
+!*/migrations/__init__.py
+
+# Archivos de configuración de entorno
+*.env
+
+# Archivos de base de datos locales
+db.sqlite3
