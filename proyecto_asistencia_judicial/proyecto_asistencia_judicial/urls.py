@@ -1,26 +1,11 @@
-"""
-URL configuration for proyecto_asistencia_judicial project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-# urls.py
-
+#Mi urls.py:
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from django.views.generic import RedirectView
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,21 +16,29 @@ urlpatterns = [
     path('administrador/', views.administrador_view, name='administrador'),
     path('registro/', views.registro_view, name='registro'),
 
+    path('consumidor/caso/nuevo/', views.crear_caso, name='crear_caso'),
+    path('consumidor/caso/<int:caso_id>/', views.ver_caso, name='ver_caso'),
+
+    path('api/casos/', views.casos_api, name='casos_api'),
+    path('api/casos/<int:caso_id>/', views.caso_detail_api, name='caso_detail_api'),
+
+    # URLs de restauración de contraseña
     path('password_reset/', auth_views.PasswordResetView.as_view(
-        template_name='password_reset_form.html',
-        email_template_name='password_reset_email.html',
-        subject_template_name='password_reset_subject.txt',
-        success_url='/'),
-        name='password_reset'),
+        template_name='password_reset/password_reset_form.html',
+        email_template_name='password_reset/password_reset_email.html',
+        subject_template_name='password_reset/password_reset_subject.txt',
+        html_email_template_name='password_reset/password_reset_email.html'
+    ), name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(
-        template_name='password_reset_done.html'), name='password_reset_done'),
+        template_name='password_reset/password_reset_done.html'
+    ), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(
-        template_name='password_reset_confirm.html',
-        success_url='/'), name='password_reset_confirm'),
+        template_name='password_reset/password_reset_confirm.html'
+    ), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(
-        template_name='password_reset_complete.html'), name='password_reset_complete'),
-
-    path('consumidor/perfil/', views.consumer_dashboard, name='consumer_profile'),
-    path('consumidor/', views.consumer_dashboard, name='consumer_dashboard'),
-
+        template_name='password_reset/password_reset_complete.html'
+    ), name='password_reset_complete'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

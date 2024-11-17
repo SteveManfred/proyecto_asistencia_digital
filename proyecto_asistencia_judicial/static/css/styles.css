@@ -1,226 +1,193 @@
-/* Generales */
+:root {
+    /* Colores principales */
+    --color-primary: #212529;
+    --color-secondary: #4a4a4a;
+    --color-success: #d4edda;
+    --color-error: #c82333;
+    --color-light: #f8f9fa;
+    --color-dark: #212529;
+    --color-muted: #6c757d;
+    --color-border: #343a40;
+    --color-hover: #e2e6ea;
+    --color-background: #f1f1f1;
+    --color-link: #007bff;
+
+    /* Transparencias */
+    --color-overlay-light: rgba(255, 255, 255, 0.8); /* Superposición más suave */
+    --color-shadow: rgba(0, 0, 0, 0.15); /* Sombra más definida */
+}
+
+
+
+/* ==========================
+   Globales
+========================== */
 body, html {
     height: 100%;
     margin: 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    background-color: #f5f5f5;
+    background-image: url(/static/img/fondo3.jpeg);
+    background-size: cover;
+    background-position: center;
+    font-family: 'Arial', sans-serif;
+    color: var(--color-dark);
 }
 
 header, footer {
-    background-color: #2e2e2e;
-    color: #ffffff;
+    background-color: var(--color-primary);
+    color: var(--color-light);
 }
 
 main {
     flex: 1;
 }
 
-/* Base */
-#consumer-menu {
-    border-right: 1px solid #ccc;
-    height: 100vh;
+/* ==========================
+   Componentes: Contenedores
+========================== */
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-#main-content {
-    padding: 20px;
+.info-card, .login-card, .container {
+    background-color: var(--color-overlay-light);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 10px var(--color-shadow);
+    margin-bottom: 2rem;
 }
 
-/* Títulos */
-h2, h3 {
-    font-family: 'Arial', sans-serif;
-    font-weight: 600;
-    color: #343a40;
-    margin-bottom: 20px;
+.img-thumbnail{
+    width: 2em;
 }
 
-/* Estilo de las etiquetas */
+.h1 {
+    color: var(--primary-color);
+    margin: 0;
+    font-size: 167rem;
+}
+
+.h2 {
+    color: var(--secondary-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+    margin-top: 0;
+}
+
+/* ==========================
+   Formularios
+========================== */
 label {
     font-weight: 500;
-    color: #495057;
+    color: black;
 }
 
-/* Estilo de los inputs, selects y textareas */
-input[type="text"], input[type="date"], select, textarea, input[type="file"] {
+input, select, textarea, .form-control {
+    font-size: 1rem;
     border-radius: 5px;
-    border: 1px solid #ced4da;
+    border: 1px solid var(--color-border);
     padding: 10px;
     width: 100%;
-    font-size: 1rem;
     box-sizing: border-box;
-}
-
-/* Estilo de las imágenes en las opciones de radio */
-.form-check-label img {
-    max-width: 50px;
-    margin-right: 10px;
-    vertical-align: middle;
-}
-
-/* Botones */
-button {
-    padding: 10px 20px;
-    font-size: 1rem;
-    border-radius: 5px;
-    margin-top: 15px;
-}
-
-.btn-primary {
-    background-color: #007bff;
-    border: none;
-}
-
-.btn-secondary {
-    background-color: #6c757d;
-    border: none;
-}
-
-.btn-success {
-    background-color: #28a745;
-    border: none;
-}
-
-button:hover {
-    opacity: 0.9;
-}
-
-/* Estilo para los inputs de tipo select */
-.select2-container {
-    width: 100% !important;
-}
-
-select.form-select {
-    padding: 10px;
-    font-size: 1rem;
-    border-radius: 5px;
-    border: 1px solid #ced4da;
-}
-
-/* Fondo de cada parte del formulario */
-.form-part {
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Espaciado entre secciones */
-.mb-3 {
-    margin-bottom: 20px;
-}
-
-/* Estilo para el contenedor de leyes */
-#lawDetails {
-    border: 1px solid #ced4da;
-    padding: 15px;
-    margin-top: 10px;
-    border-radius: 5px;
-    background-color: #f8f9fa;
-}
-
-/* Estilo para las listas de leyes y casos relacionados */
-.list-group-item {
-    cursor: pointer;
-}
-
-.list-group-item:hover {
-    background-color: #f1f1f1;
-}
-
-/* Estilo para los botones de continuar y volver */
-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* Imagen de las opciones de conflicto */
-.img-thumbnail {
-    max-width: 50px;
-    height: auto;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-}
-
-/* Estilo para el contenedor del formulario */
-.container {
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    padding: 30px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-    margin-top: 50px;
-}
-
-/* Títulos y subtítulos */
-h2 {
-    font-size: 2rem;
-    color: #333;
-}
-
-h3 {
-    font-size: 1.5rem;
-    color: #333;
-    margin-bottom: 15px;
-}
-
-/* Ajuste del tamaño de los inputs */
-input, select, textarea {
-    font-size: 1rem;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    padding: 10px;
-    width: 100%;
 }
 
 textarea {
     resize: vertical;
 }
 
-/* Alineación y espaciado en los botones */
-button {
-    padding: 10px 25px;
-    font-size: 1rem;
-    margin-top: 15px;
-    border-radius: 5px;
-}
-
-.btn-primary {
-    background-color: #007bff;
-    border: none;
-}
-
-.btn-secondary {
-    background-color: #6c757d;
-    border: none;
-}
-
-.btn-success {
-    background-color: #28a745;
-    border: none;
-}
-
-/* Efecto hover en los botones */
-button:hover {
-    opacity: 0.9;
-}
-
-/* Estilo para los mensajes de retroalimentación */
-#lawDetails {
-    padding: 15px;
-    background-color: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-top: 20px;
-}
-
-.list-group-item {
+.form-check {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
     cursor: pointer;
 }
 
-.list-group-item:hover {
-    background-color: #f1f1f1;
+.form-check.selected {
+    border-color: var(--color-link);
+    box-shadow: 0 0 10px var(--color-shadow);
+    background-color: var(--color-background);
 }
 
-/* Espaciado entre elementos */
-.mb-3 {
-    margin-bottom: 20px;
+/* ==========================
+   Botones
+========================== */
+button {
+    padding: 10px 25px;
+    font-size: 1rem;
+    border-radius: 5px;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-light);
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-secondary);
+    color: var(--color-light);
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background-color: var(--color-primary);
+    color: var(--color-light);
+    border: none;
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-primary);
+    color: var(--color-light);
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background-color: var(--color-success);
+    color: var(--color-light);
+    border: none;
+}
+
+/* ==========================
+   Recursos
+========================== */
+
+.resources img {
+    max-width: 100%; /* Las imágenes no excederán el 100% de su contenedor */
+    height: auto; /* Mantiene la proporción original de la imagen */
+    margin: 10px; /* Espacio entre las imágenes */
+    border-radius: 8px; /* Bordes redondeados si deseas */
+    max-height: 75px; /* Limita la altura de las imágenes */
+}
+
+/* Si quieres que las imágenes se ajusten en una fila horizontal */
+.resources div {
+    display: flex;
+    justify-content: space-around; /* Espacia las imágenes */
+    flex-wrap: wrap; /* Asegura que las imágenes no se desborden en pantallas pequeñas */
+}
+
+/* Adaptación para dispositivos pequeños */
+@media (max-width: 768px) {
+    .resources img {
+        max-height: 120px; /* Para pantallas pequeñas, reducimos un poco más el tamaño */
+    }
 }

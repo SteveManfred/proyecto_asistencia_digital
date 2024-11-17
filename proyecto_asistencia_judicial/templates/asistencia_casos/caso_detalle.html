@@ -1,0 +1,136 @@
+<!-- Mi caso_detalle.html -->
+{% extends "base.html" %}{% load static %}
+
+{% block title %}Asistencia Judicial{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/caso_detalle.css' %}">
+
+<div class="case-report">
+    <div class="report-container">
+
+        <div class="report-header">
+            <h1>Informe de Caso #{{ caso.id }}</h1>
+        </div>
+
+        <div class="report-meta">
+            <div class="info-item">
+                <span class="label">Fecha de Registro:</span>
+                <span class="value">{{ caso.created_at|date:"d/m/Y H:i" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Usuario:</span>
+                <span class="value">{{ caso.usuario.get_full_name }}</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Información General del Caso</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="label">Tipo de Conflicto:</span>
+                    <span class="value">{{ caso.conflict_type }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Detalles del Conflicto:</span>
+                    <span class="value">{{ caso.conflict_details }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Tamaño del Producto:</span>
+                    <span class="value">{{ caso.product_size }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Condiciones de Compra:</span>
+                    <span class="value">{{ caso.purchase_conditions }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Información de la Compra</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="label">Método de Adquisición:</span>
+                    <span class="value">{{ caso.acquisition_method }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Fecha de Compra:</span>
+                    <span class="value">{{ caso.purchase_date|date:"d/m/Y" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Tienda:</span>
+                    <span class="value">{{ caso.store_name }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Número de Pedido:</span>
+                    <span class="value">{{ caso.order_number }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Estado y Resolución</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="label">Respuesta de la Tienda:</span>
+                    <span class="value">{{ caso.store_response }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Expectativa de Resolución:</span>
+                    <span class="value">{{ caso.resolution_expectation }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Comunicaciones Previas</h2>
+            <div class="timeline">
+                {% if caso.contacted_store == 'si' %}
+                <div class="timeline-item">
+                    <div class="timeline-date">{{ caso.contact_date|date:"d/m/Y" }}</div>
+                    <div class="timeline-content">
+                        <p>Contacto con la tienda vía {{ caso.contact_method }}</p>
+                    </div>
+                </div>
+                {% else %}
+                <p>No se han registrado comunicaciones previas con la tienda.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if caso.additional_details %}
+        <div class="section">
+            <h2>Información Adicional</h2>
+            <p>{{ caso.additional_details }}</p>
+        </div>
+        {% endif %}
+
+        {% if caso.documents %}
+        <div class="section">
+            <h2>Documentos Adjuntos</h2>
+            <div class="documents-section">
+                <ul class="document-list">
+                    <li class="document-item">
+                        <span class="document-icon">📎</span>
+                        {{ caso.documents.name }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="buttons-container">
+            <button class="btn btn-primary" onclick="generatePDF()">Descargar PDF</button>
+            <!-- <button class="btn btn-primary" onclick="window.print()">Imprimir Informe</button> -->
+            <a href="javascript:history.back()" class="btn btn-secondary"> <i class="fa fa-arrow-left"></i> Volver </a>
+        </div>
+    </div>
+
+    <script>
+        function generatePDF() {
+            window.print();
+        }
+    </script>
+</div>
+{% endblock %}
