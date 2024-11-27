@@ -39,3 +39,4 @@ class NuevoCasoForm(forms.ModelForm):
             if documents.size > 5 * 1024 * 1024:  # 5MB limit
                 raise ValidationError('El archivo es demasiado grande. El tamaño máximo es 5MB.')
         return documents
+    

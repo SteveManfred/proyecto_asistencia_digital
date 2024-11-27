@@ -12,30 +12,32 @@
 </head>
 <body>
     <div class="container mt-1">
-        <h2>Registrar Nuevo Caso</h2>
+        <h2 style="font-weight: bold">Registrar Nuevo Caso</h2>
+        </br>
         <form method="POST" action="{% url 'crear_caso' %}" enctype="multipart/form-data">
             {% csrf_token %}
             
             <!-- Sección 1: Selección de clase de conflicto -->
             <h3>Seleccione el tipo de conflicto</h3>
             <div class="form-check" id="option1">
-                <input class="form-check-input" type="radio" name="conflict_type" id="conflict1" value="problema_compra" required>
+                <input class="form-check-input" type="radio" name="conflict_type" id="conflict1" value="Problema de compra" required>
                 <label class="form-check-label" for="conflict1">
                     <img src="{% static 'img/compra.png' %}" alt="Problema Compra" class="img-thumbnail"> Tuve un problema durante el proceso de compra.
                 </label>
             </div>
             <div class="form-check" id="option2">
-                <input class="form-check-input" type="radio" name="conflict_type" id="conflict2" value="problema_entrega" required>
+                <input class="form-check-input" type="radio" name="conflict_type" id="conflict2" value="Problema de entrega" required>
                 <label class="form-check-label" for="conflict2">
                     <img src="{% static 'img/entrega.png' %}" alt="Problema Entrega" class="img-thumbnail"> Tengo un problema con la entrega.
                 </label>
             </div>
             <div class="form-check" id="option3">
-                <input class="form-check-input" type="radio" name="conflict_type" id="conflict3" value="problema_producto" required>
+                <input class="form-check-input" type="radio" name="conflict_type" id="conflict3" value="Problema de producto" required>
                 <label class="form-check-label" for="conflict3">
                     <img src="{% static 'img/producto.png' %}" alt="Problema Producto" class="img-thumbnail"> Tengo un problema con el producto.
                 </label>
             </div>
+            </br>
         
             <!-- Sección 2: Detalles del Conflicto -->
             <h3>Detalles del Conflicto</h3>
@@ -91,6 +93,7 @@
                     <option value="credito">Crédito en la tienda</option>
                 </select>
             </div>
+            </br>
         
             <!-- Sección 3: Información sobre la transacción -->
             <h3>Información sobre la transacción</h3>
@@ -113,6 +116,7 @@
                 <label>Número de Pedido</label>
                 <input type="text" class="form-control" name="order_number" required>
             </div>
+            </br>
         
             <!-- Sección 4: Acciones previas -->
             <h3>Acciones previas (Opcional)</h3>
@@ -137,6 +141,7 @@
                     <option value="chat">Chat en línea</option>
                 </select>
             </div>
+            </br>
         
             <!-- Sección 5: Información adicional -->
             <h3>Información adicional</h3>
@@ -144,6 +149,7 @@
                 <label>Detalles adicionales</label>
                 <textarea class="form-control" name="additional_details" rows="3"></textarea>
             </div>
+            </br>
         
             <!-- Sección 6: Adjuntar documentos -->
             <h3>Adjuntar documentos</h3>
@@ -151,6 +157,7 @@
                 <label>Adjuntar documentos o imágenes (máximo 2)</label>
                 <input type="file" class="form-control" name="documents" multiple>
             </div>
+            </br>
         
             {% if form.errors %}
             <div class="alert alert-danger">

@@ -1,11 +1,78 @@
 <!-- Mi administrador.html -->
-{% extends "base.html" %}
+{% extends "base.html" %} {% load static %}
 
 {% block title %}Dashboard del Administrador{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2>Bienvenido, Administrador</h2>
-    <p>Esta es tu área de administración.</p>
+
+<div class="container-fluid mt-5">
+    <div class="row">
+        <!-- Aside -->
+        <aside class="col-md-3 bg-light p-4 shadow-sm rounded" id="aside-menu">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="loadSection('admin_profile', this)">Perfil</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="loadSection('admin_cases', this)">Mis Casos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="loadSection('admin_all-cases', this)">Todos los Casos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="loadSection('admin_new-case', this)">Nuevo Caso</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="loadSection('admin_new-admin', this)">Crear Administrador</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="loadSection('admin_dashboard', this)">Resumen de datos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="loadSection('admin_updates', this)">Actualizaciones</a>
+                </li>
+            </ul>
+        </aside>        
+
+        <!-- Main Content Area -->
+        <main class="col-md-9" id="main-content">
+            <h2 style="font-weight: bold">Panel de Administración</h2>
+            <p>Bienvenido al panel de administración. Selecciona una opción del menú para gestionar el sistema.</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <h2 style="font-weight: bold">Resumen del Sistema</h2>
+                        <p>Panel de control observar el comportamiento de los registrados.</p>
+                        <p>Accede a todas los casos registrados por los usuarios.</p>
+                        <p>Gestiona casos y usuarios del sistema desde un solo lugar.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <h2 style="font-weight: bold">Funcionalidades Principales</h2>
+                        <ul>
+                            <li>Gestión de casos de usuarios</li>
+                            <li>Administración de perfiles</li>
+                            <li>Creación de nuevos administradores</li>
+                            <li>Visualización de estadísticas</li>
+                            <li>Creacion de administradores</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const usuario = {
+            first_name: "{{ usuario.first_name }}",
+            email: "{{ usuario.email }}",
+            username: "{{ usuario.username }}",
+            is_staff: true
+        };
+    </script>
+    <script src="{% static 'js/administrador_aside.js' %}"></script>
+
 </div>
+
 {% endblock %}

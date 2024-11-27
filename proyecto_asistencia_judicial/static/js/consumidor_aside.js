@@ -1,10 +1,12 @@
+// Mi consumidor_aside.js:
 function loadSection(section) {
     const mainContent = document.getElementById("main-content");
 
     if (section === "consumidor_profile") {
         mainContent.innerHTML = `
         <div class="container mt-1">
-            <h2>Perfil del Consumidor</h2>
+            <h2 style="font-weight: bold">Perfil del Consumidor</h2>
+            </br>
             <form>
                 <div class="form-group">
                     <label for="nombre">Nombre Completo:</label>
@@ -21,19 +23,20 @@ function loadSection(section) {
             </form>
         </div>`;
     } else if (section === "consumidor_cases") {
-        // Estructura de la tabla
         mainContent.innerHTML = `
         <div class="container mt-1">
-            <h2>Mis Casos</h2>
+            <h2 style="font-weight: bold">Mis Casos</h2>
+            </br>
             <div class="search-container">
                 <input type="text" id="searchInput" class="form-control" placeholder="Buscar casos..." onkeyup="searchCases()">
             </div>
+            </br>
             <div class="table-responsive">
                 <table class="table text-center">
                     <thead>
                         <tr>
                             <th>Fecha de Registro</th>
-                            <th>Fecha de Compra</th>
+                            <th>Tipo de Conflicto</th>
                             <th>Tienda</th>
                             <th>Método</th>
                             <th>Acciones</th>
@@ -60,19 +63,18 @@ function loadSection(section) {
                         </tr>`;
                     return;
                 }
-
                 tbody.innerHTML = casos.map(caso => `
                     <tr>
                         <td>${formatDate(caso.created_at)}</td>
-                        <td>${formatDate(caso.purchase_date)}</td>
+                        <td>${caso.conflict_type}</td>
                         <td>${caso.store_name}</td>
                         <td>${formatAcquisitionMethod(caso.acquisition_method)}</td>
                         <td>
-                            <div class="btn-group">
-                                <button onclick="verCaso(${caso.id})" class="btn btn-link btn-sm">
+                            <div>
+                                <button onclick="verCaso(${caso.id})" class="btn btn-primary btn-sm" aria-label="Ver caso">
                                     <i class="fa fa-eye fa-lg" aria-hidden="true"></i>
                                 </button>
-                                <button onclick="eliminarCaso(${caso.id})" class="btn btn-link btn-sm">
+                                <button onclick="eliminarCaso(${caso.id})" class="btn btn-danger btn-sm" aria-label="Eliminar caso">
                                     <i class="fa fa-trash fa-lg" aria-hidden="true"></i>
                                 </button>
                             </div>
@@ -98,21 +100,24 @@ function loadSection(section) {
             .catch(error => console.error('Error al cargar la sección de nuevo caso:', error));
     } else if (section === "consumidor_updates") {
         mainContent.innerHTML = `
-            <h2>Actualizaciones</h2>
+            <div class="container mt-1">
+            <h2 style="font-weight: bold">Actualizaciones</h2>
+            </br>
             <ul class="list-group">
                 <li class="list-group-item">No hay actualizaciones disponibles</li>
-            </ul>`;
+            </ul>
+            </div>`;
     }
 }
 
 // Función auxiliar para formatear fechas
-function formatDate(dateString) {
+function formatDate(dateString, locale = 'es-ES') {
     const options = { 
         year: 'numeric', 
         month: 'long', 
         day: 'numeric',
     };
-    return new Date(dateString).toLocaleDateString('es-ES', options);
+    return new Date(dateString).toLocaleDateString(locale, options);
 }
 
 // Función auxiliar para formatear el método de adquisición
@@ -132,6 +137,10 @@ function verCaso(casoId) {
 // Función para eliminar un caso
 function eliminarCaso(casoId) {
     if (confirm('¿Está seguro que desea eliminar este caso? Esta acción no se puede deshacer.')) {
+        // Mostrar indicador de carga
+        const casosTbody = document.getElementById('casos-tbody');
+        casosTbody.innerHTML = `<tr><td colspan="5" class="text-center">Eliminando...</td></tr>`;
+        
         fetch(`/api/casos/${casoId}/`, {
             method: 'DELETE',
             headers: {
@@ -140,8 +149,7 @@ function eliminarCaso(casoId) {
         })
         .then(response => {
             if (response.ok) {
-                // Recargar la sección de casos
-                loadSection('consumidor_cases');
+                loadSection('consumidor_cases');  // Recargar la lista de casos
             } else {
                 throw new Error('Error al eliminar el caso');
             }
@@ -149,6 +157,7 @@ function eliminarCaso(casoId) {
         .catch(error => {
             console.error('Error:', error);
             alert('No se pudo eliminar el caso. Por favor, intente nuevamente.');
+            casosTbody.innerHTML = `<tr><td colspan="5" class="text-center">Error al eliminar el caso.</td></tr>`;
         });
     }
 }
@@ -170,29 +179,26 @@ function getCookie(name) {
 }
 
 // Función para buscar casos
+let debounceTimeout;
 function searchCases() {
     const input = document.getElementById('searchInput');
     const filter = input.value.toLowerCase();
     const rows = document.querySelectorAll('#casos-tbody tr');
 
-    rows.forEach(row => {
-        const cells = row.getElementsByTagName('td');
-        let match = false;
+    clearTimeout(debounceTimeout);
 
-        // Verificar si algún valor de la fila coincide con la búsqueda
-        for (let i = 0; i < cells.length - 1; i++) { // Excluimos la columna de acciones
-            const cell = cells[i];
-            if (cell.textContent.toLowerCase().includes(filter)) {
-                match = true;
-                break;
+    debounceTimeout = setTimeout(() => {
+        rows.forEach(row => {
+            const cells = row.getElementsByTagName('td');
+            let match = false;
+            for (let i = 0; i < cells.length - 1; i++) {
+                const cell = cells[i];
+                if (cell.textContent.toLowerCase().includes(filter)) {
+                    match = true;
+                    break;
+                }
             }
-        }
-
-        // Mostrar u ocultar la fila dependiendo del resultado de la búsqueda
-        if (match) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
-    });
+            row.style.display = match ? '' : 'none';
+        });
+    }, 300);
 }

@@ -112,6 +112,9 @@ DEFAULT_FROM_EMAIL = 'stevesalastest@gmail.com'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# Dominio del proyecto
+DOMAIN = ''  
+
 # Registro de eventos durante la ejecución (Solo test particular)
 #LOGGING = {
 #    'version': 1,

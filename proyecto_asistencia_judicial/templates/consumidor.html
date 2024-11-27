@@ -1,5 +1,5 @@
 <!-- Mi consumidor.html -->
-{% extends "base.html" %}
+{% extends "base.html" %} {% load static %}
 
 {% block title %}Dashboard del Consumidor{% endblock %}
 
@@ -8,30 +8,47 @@
 <div class="container-fluid mt-5">
     <div class="row">
         <!-- Aside -->
-        <aside class="col-md-3 bg-light p-3" id="consumer-menu">
-            <h4>Menú</h4>
+        <aside class="col-md-3 bg-light p-4 shadow-sm rounded" id="aside-menu">
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#" onclick="loadSection('consumidor_profile')">Perfil</a>
+                    <a class="nav-link" href="#" onclick="loadSection('consumidor_profile', this)">Perfil</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" onclick="loadSection('consumidor_cases')">Casos</a>
+                    <a class="nav-link" href="#" onclick="loadSection('consumidor_cases', this)">Mis Casos</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" onclick="loadSection('consumidor_new-case')">Nuevo Caso</a>
+                    <a class="nav-link" href="#" onclick="loadSection('consumidor_new-case', this)">Nuevo Caso</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" onclick="loadSection('consumidor_updates')">Actualizaciones</a>
+                    <a class="nav-link" href="#" onclick="loadSection('consumidor_updates', this)">Actualizaciones</a>
                 </li>
             </ul>
-        </aside>
+        </aside>        
 
         <!-- Main Content Area -->
         <main class="col-md-9" id="main-content">
-            <h2>Bienvenido, Consumidor</h2>
+            <h2 style="font-weight: bold">Bienvenido, Consumidor</h2>
             <p>Selecciona una opción del menú para ver o gestionar tu información.</p>
+            <div>
+                <div class="info-card">
+                    <h2 style="font-weight: bold">¿En qué consiste?</h2>
+                    <p>Este programa está diseñado para facilitarte el entendimiento de tu caso dentro del marco legal chileno, sin necesidad de recurrir a un abogado o programar consultas previas.</p>
+                    <p>Te orientaremos de forma clara y sencilla hacia la resolución de tu caso, ofreciéndote herramientas prácticas y accesibles.</p>
+                    <p>Evita esperas prolongadas y recibe asesoramiento de manera eficiente y directa.</p>
+                    <p>Todo el proceso es completamente en línea, adaptado a tus necesidades.</p>
+                </div>
+                
+                <div class="info-card">
+                    <h2 style="font-weight: bold">¿Cuál es el proceso?</h2>
+                    <p>El programa sigue un flujo diseñado para brindarte resultados rápidos y precisos, sin necesidad de intermediarios.</p>
+                    <p>Podrás ingresar los detalles de tu caso a través de un formulario intuitivo, recibir análisis y orientación legal basados en inteligencia artificial.</p>
+                    <p>Te ofreceremos predicciones y recomendaciones claras, facilitando la toma de decisiones informadas.</p>
+                    <p>Todo esto está disponible en línea, garantizando un servicio accesible y eficiente.</p>
+                </div>
+            </div>
         </main>
     </div>
+    
     <script>
         const usuario = {
             first_name: "{{ usuario.first_name }}",
@@ -39,6 +56,7 @@
             username: "{{ usuario.username }}",
         };
     </script>
+    <script src="{% static 'js/consumidor_aside.js' %}"></script>
     
 </div>
 

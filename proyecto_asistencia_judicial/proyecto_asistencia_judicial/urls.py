@@ -6,6 +6,7 @@ from django.views.generic import RedirectView
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
+from .views import dashboard_data
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -15,14 +16,13 @@ urlpatterns = [
     path('consumidor/', views.consumer_dashboard, name='consumidor'),
     path('administrador/', views.administrador_view, name='administrador'),
     path('registro/', views.registro_view, name='registro'),
-
     path('consumidor/caso/nuevo/', views.crear_caso, name='crear_caso'),
     path('consumidor/caso/<int:caso_id>/', views.ver_caso, name='ver_caso'),
-
     path('api/casos/', views.casos_api, name='casos_api'),
     path('api/casos/<int:caso_id>/', views.caso_detail_api, name='caso_detail_api'),
-
-    # URLs de restauración de contraseña
+    path('api/todos_los_casos/', views.todos_los_casos, name='todos_los_casos'),
+    path('api/crear_admin/', views.crear_admin, name='crear_admin'),
+    path('api/dashboard/', dashboard_data, name='dashboard_data'),
     path('password_reset/', auth_views.PasswordResetView.as_view(
         template_name='password_reset/password_reset_form.html',
         email_template_name='password_reset/password_reset_email.html',

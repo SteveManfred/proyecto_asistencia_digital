@@ -2,7 +2,7 @@
     /* Colores principales */
     --color-primary: #212529;
     --color-secondary: #4a4a4a;
-    --color-success: #d4edda;
+    --color-success: #00be2c;
     --color-error: #c82333;
     --color-light: #f8f9fa;
     --color-dark: #212529;
@@ -16,8 +16,6 @@
     --color-overlay-light: rgba(255, 255, 255, 0.8); /* Superposición más suave */
     --color-shadow: rgba(0, 0, 0, 0.15); /* Sombra más definida */
 }
-
-
 
 /* ==========================
    Globales
@@ -151,6 +149,11 @@ button:hover {
     background-color: var(--color-primary);
     color: var(--color-light);
     border: none;
+    padding: 10px 25px;
+    font-size: 1rem;
+    border-radius: 5px;
+    margin-top: 15px;
+    transition: all 0.3s ease;
 }
 
 .btn-secondary:hover {
@@ -190,4 +193,59 @@ button:hover {
     .resources img {
         max-height: 120px; /* Para pantallas pequeñas, reducimos un poco más el tamaño */
     }
+}
+
+
+/* ==========================
+   Tabla
+========================== */
+
+td {
+    align-content: end !important;
+}
+
+/* ===========================
+   Estilos del Aside
+=========================== */
+#aside-menu {
+    background-color: var(--color-light);
+    padding: 2rem;
+    border-radius: 15px !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#aside-menu h4 {
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--color-primary);
+}
+
+#aside-menu .nav-item {
+    margin-bottom: 1rem;
+}
+
+#aside-menu .nav-link {
+    color: var(--color-primary);
+    font-weight: 500;
+    padding: 12px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#aside-menu .nav-link.active {
+    background-color: var(--color-primary);
+    color: var(--color-light);
+}
+
+#aside-menu .nav-link:hover {
+    background-color: var(--color-hover);
+    color: var(--color-primary);
+    transform: translateX(5px);
+}
+
+#aside-menu .nav-item:not(:last-child) {
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 1rem;
 }

@@ -7,7 +7,19 @@ from django.contrib.auth import login, authenticate
 from django import forms
 from django.db import IntegrityError
 from .forms import NuevoCasoForm
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 from core.models import Caso
+from django.views.decorators.csrf import csrf_exempt
+import logging
+from django.db.models import Count
+from django.db.models.functions import Coalesce
+from django.db.models import Value
+from django.db.models import Count
+from django.db.models.functions import TruncMonth
+from django.utils import timezone
+from datetime import timedelta
+
 
 # Vista para el consumidor
 @login_required
@@ -21,7 +33,8 @@ def consumer_dashboard(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def administrador_view(request):
-    return render(request, 'administrador.html')
+    usuario = request.user
+    return render(request, 'administrador.html', {'usuario': usuario})
 
 # Formulario de registro para nuevo consumidor
 class RegistroForm(forms.Form):
@@ -81,23 +94,14 @@ def custom_login_view(request):
                 return redirect('login')
     return render(request, 'login.html', {'form': form})
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from .forms import NuevoCasoForm
-import logging
 
 logger = logging.getLogger(__name__)
 
 @login_required
 def crear_caso(request):
+    # Verifica si el usuario es un administrador o un consumidor
     if request.method == 'POST':
-        logger.debug(f"Datos POST recibidos: {request.POST}")
-        logger.debug(f"Archivos recibidos: {request.FILES}")
-        
         form = NuevoCasoForm(request.POST, request.FILES)
-        
-        # Verificar si todos los campos requeridos están presentes
         required_fields = ['conflict_type', 'conflict_details', 'product_size', 
                          'purchase_conditions', 'store_response', 'resolution_expectation',
                          'acquisition_method', 'purchase_date', 'store_name', 'order_number']
@@ -105,49 +109,38 @@ def crear_caso(request):
         missing_fields = [field for field in required_fields if not request.POST.get(field)]
         
         if missing_fields:
-            logger.error(f"Campos faltantes: {missing_fields}")
             messages.error(request, f"Faltan los siguientes campos requeridos: {', '.join(missing_fields)}")
             return render(request, 'asistencia_casos/new_case.html', {'form': form})
-        
+
         if form.is_valid():
             try:
                 caso = form.save(commit=False)
-                caso.usuario = request.user
+                caso.usuario = request.user  # Asigna el caso al usuario que lo crea
                 caso.save()
                 
-                # Si hay archivos adjuntos, guardarlos
                 if 'documents' in request.FILES:
                     caso.documents = request.FILES['documents']
                     caso.save()
                 
-                logger.info(f"Caso creado exitosamente: ID {caso.id}")
                 messages.success(request, "El caso ha sido registrado exitosamente.")
-                return redirect('consumidor')
+                return redirect('administrador' if request.user.is_staff else 'consumidor')  # Redirige según el rol del usuario
             
             except Exception as e:
-                logger.error(f"Error al guardar el caso: {str(e)}")
                 messages.error(request, "Ocurrió un error al guardar el caso. Por favor, intente nuevamente.")
-        else:
-            logger.error(f"Errores de validación del formulario: {form.errors}")
-            messages.error(request, "Por favor corrija los errores en el formulario.")
+                return render(request, 'asistencia_casos/new_case.html', {'form': form})
     else:
         form = NuevoCasoForm()
     
     return render(request, 'asistencia_casos/new_case.html', {'form': form})
 
+
 @login_required
 def ver_caso(request, caso_id):
-    caso = get_object_or_404(Caso, id=caso_id, usuario=request.user)
+    if request.user.is_staff:
+        caso = get_object_or_404(Caso, id=caso_id)
+    else:
+        caso = get_object_or_404(Caso, id=caso_id, usuario=request.user)
     return render(request, 'asistencia_casos/caso_detalle.html', {'caso': caso})
-
-
-
-
-from django.http import JsonResponse
-from django.core.serializers import serialize
-from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
-import json
 
 @login_required
 def casos_api(request):
@@ -160,19 +153,116 @@ def casos_api(request):
             'created_at': caso.created_at.isoformat(),
             'purchase_date': caso.purchase_date.isoformat(),
             'store_name': caso.store_name,
-            'acquisition_method': caso.acquisition_method
+            'acquisition_method': caso.acquisition_method,
+            'conflict_type': caso.conflict_type,
         })
-    
     return JsonResponse(casos_data, safe=False)
 
+# Eliminación de casos
 @login_required
 @require_http_methods(['DELETE'])
 def caso_detail_api(request, caso_id):
     try:
-        caso = Caso.objects.get(id=caso_id, usuario=request.user)
+        if request.user.is_staff:
+            caso = Caso.objects.get(id=caso_id)
+        else:
+            caso = Caso.objects.get(id=caso_id, usuario=request.user)
         caso.delete()
         return JsonResponse({'status': 'success'})
     except Caso.DoesNotExist:
         return JsonResponse({'error': 'Caso no encontrado'}, status=404)
     except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
+        logger.error(f"Error inesperado: {e}")
+        return JsonResponse({'error': 'Ocurrió un error inesperado'}, status=500)
+    
+# Vista para obtener todos los casos (solo para administradores)
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def todos_los_casos(request):
+    casos = Caso.objects.all().order_by('-created_at')
+    casos_data = []
+    for caso in casos:
+        rut_usuario = caso.usuario.username
+        casos_data.append({
+            'id': caso.id,
+            'created_at': caso.created_at.isoformat(),
+            'purchase_date': caso.purchase_date.isoformat(),
+            'store_name': caso.store_name,
+            'acquisition_method': caso.acquisition_method,
+            'rut_usuario': rut_usuario,
+            'conflict_type': caso.conflict_type
+        })
+    return JsonResponse(casos_data, safe=False)
+
+# Formulario de registro para nuevo administrador
+@csrf_exempt
+@require_http_methods(['POST'])
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def crear_admin(request):
+    username = request.POST.get('username')
+    first_name = request.POST.get('first_name')
+    email = request.POST.get('email')
+    password = request.POST.get('password')
+    password_confirm = request.POST.get('password_confirm')
+
+    if password != password_confirm:
+        return JsonResponse({'status': 'error', 'error': 'Las contraseñas no coinciden'})
+
+    try:
+        user = User.objects.create_user(
+            username=username,
+            first_name=first_name,
+            email=email,
+            password=password
+        )
+        user.is_staff = True
+        user.save()
+
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'error': str(e)})
+
+# Panel de control de administrador    
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def dashboard_data(request):
+    # Resumen General
+    total_casos = Caso.objects.count()
+    
+    resumen_general = {
+        'total_casos': total_casos,
+        'tipos_conflicto': list(Caso.objects.values('conflict_type').annotate(count=Count('id'))),
+        'detalles_conflicto': list(Caso.objects.values('conflict_details').annotate(count=Count('id'))),
+        'tamanos_producto': list(Caso.objects.values('product_size').annotate(count=Count('id'))),
+        'condiciones_compra': list(Caso.objects.values('purchase_conditions').annotate(count=Count('id'))),
+        'metodos_adquisicion': list(Caso.objects.values('acquisition_method').annotate(count=Count('id'))),
+        'respuestas_tienda': list(Caso.objects.values('store_response').annotate(count=Count('id'))),
+        'expectativas_resolucion': list(Caso.objects.values('resolution_expectation').annotate(count=Count('id'))),
+    }
+    
+    # Resumen del Último Mes
+    hace_un_mes = timezone.now() - timedelta(days=30)
+    casos_ultimo_mes = Caso.objects.filter(created_at__gte=hace_un_mes)
+    
+    resumen_ultimo_mes = {
+        'total_casos': casos_ultimo_mes.count(),
+        'tipos_conflicto': list(casos_ultimo_mes.values('conflict_type').annotate(count=Count('id'))),
+        'detalles_conflicto': list(casos_ultimo_mes.values('conflict_details').annotate(count=Count('id'))),
+        'tamanos_producto': list(casos_ultimo_mes.values('product_size').annotate(count=Count('id'))),
+        'condiciones_compra': list(casos_ultimo_mes.values('purchase_conditions').annotate(count=Count('id'))),
+        'metodos_adquisicion': list(casos_ultimo_mes.values('acquisition_method').annotate(count=Count('id'))),
+        'respuestas_tienda': list(casos_ultimo_mes.values('store_response').annotate(count=Count('id'))),
+        'expectativas_resolucion': list(casos_ultimo_mes.values('resolution_expectation').annotate(count=Count('id'))),
+    }
+    
+    return JsonResponse({
+        'resumen_general': resumen_general,
+        'resumen_ultimo_mes': resumen_ultimo_mes
+    })
+
+
+# Reemplaza los valores nulos por un valor predeterminado
+tipos_conflicto = Caso.objects.values('conflict_type')\
+    .annotate(count=Count('id'))\
+    .order_by('conflict_type')
