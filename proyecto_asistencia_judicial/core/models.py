@@ -19,7 +19,14 @@ class Caso(models.Model):
     contact_method = models.CharField(max_length=50, null=True, blank=True)
     additional_details = models.TextField(null=True, blank=True)
     documents = models.FileField(upload_to='casos/', null=True, blank=True)
-
+    
+    # Nuevos campos para almacenar respuestas
+    legal_feedback = models.TextField(null=True, blank=True)  # Retroalimentación de leyes
+    results_prediction = models.TextField(null=True, blank=True)  # Predicción de resultados
+    recommendations = models.TextField(null=True, blank=True)  # Recomendaciones
+    
+    full_ai_response = models.TextField(null=True, blank=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

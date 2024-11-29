@@ -1,19 +1,20 @@
 <!-- Mi caso_detalle.html -->
 {% extends "base.html" %}{% load static %}
 
-{% block title %}Asistencia Judicial{% endblock %}
+{% block title %}Asistencia Judicial - Caso #{{ caso.id }}{% endblock %}
 
 {% block content %}
 
 <link rel="stylesheet" href="{% static 'css/caso_detalle.css' %}">
 
 <div class="case-report">
+
+    <!-- Primera página -->
     <div class="report-container">
-
         <div class="report-header">
-            <h1>Informe de Caso #{{ caso.id }}</h1>
+            <h1>Informe de Caso #{{ caso.id }}. Parte 1</h1>
         </div>
-
+    
         <div class="report-meta">
             <div class="info-item">
                 <span class="label">Fecha de Registro:</span>
@@ -24,7 +25,7 @@
                 <span class="value">{{ caso.usuario.get_full_name }}</span>
             </div>
         </div>
-
+    
         <div class="section">
             <h2>Información General del Caso</h2>
             <div class="info-grid">
@@ -46,7 +47,7 @@
                 </div>
             </div>
         </div>
-
+    
         <div class="section">
             <h2>Información de la Compra</h2>
             <div class="info-grid">
@@ -68,7 +69,7 @@
                 </div>
             </div>
         </div>
-
+    
         <div class="section">
             <h2>Estado y Resolución</h2>
             <div class="info-grid">
@@ -82,7 +83,7 @@
                 </div>
             </div>
         </div>
-
+    
         <div class="section">
             <h2>Comunicaciones Previas</h2>
             <div class="timeline">
@@ -98,14 +99,14 @@
                 {% endif %}
             </div>
         </div>
-
+    
         {% if caso.additional_details %}
         <div class="section">
             <h2>Información Adicional</h2>
             <p>{{ caso.additional_details }}</p>
         </div>
         {% endif %}
-
+    
         {% if caso.documents %}
         <div class="section">
             <h2>Documentos Adjuntos</h2>
@@ -119,18 +120,72 @@
             </div>
         </div>
         {% endif %}
-
-        <div class="buttons-container">
-            <button class="btn btn-primary" onclick="generatePDF()">Descargar PDF</button>
-            <!-- <button class="btn btn-primary" onclick="window.print()">Imprimir Informe</button> -->
-            <a href="javascript:history.back()" class="btn btn-secondary"> <i class="fa fa-arrow-left"></i> Volver </a>
-        </div>
     </div>
 
-    <script>
-        function generatePDF() {
-            window.print();
-        }
-    </script>
+    <!-- Segunda página -->
+    <div class="report-container page-break">
+        <div class="report-header">
+            <h1>Informe de Caso #{{ caso.id }}. Parte 2</h1>
+        </div>
+
+        <!-- Retroalimentación de Leyes Relacionadas -->
+        <div class="section">
+            <h2>Retroalimentación de Leyes Relacionadas</h2>
+            <div class="legal-feedback">
+                {% if caso.legal_feedback %}
+                    <p>{{ caso.legal_feedback|safe }}</p>
+                {% else %}
+                    <p>No se han identificado observaciones legales específicas para este caso.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Predicción de los Resultados según la ley</h2>
+            <div class="results-prediction">
+                {% if caso.results_prediction %}
+                    <p>{{ caso.results_prediction|safe }}</p>
+                {% else %}
+                    <p>No se han determinado conclusiones preliminares específicas.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Recomendaciones</h2>
+            <div class="recommendations">
+                {% if caso.recommendations %}
+                    <p>{{ caso.recommendations|safe }}</p>
+                {% else %}
+                    <p>No se han generado recomendaciones específicas en esta etapa.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Respuesta Completa de la IA -->
+        <!--<div class="section">
+            <h2>Respuesta Completa de la IA</h2>
+            <div class="full-response">
+                {% if caso.full_ai_response %}
+                    <p>{{ caso.full_ai_response|safe }}</p>
+                {% else %}
+                    <p>No se obtuvo una respuesta completa de la IA.</p>
+                {% endif %}
+            </div>
+        </div> 
+    </div>-->
+
 </div>
+
+<div class="buttons-container">
+    <button class="btn btn-primary" onclick="generatePDF()">Descargar PDF</button>
+    <a href="javascript:history.back()" class="btn btn-secondary"> <i class="fa fa-arrow-left"></i> Volver </a>
+</div>
+
+<script>
+function generatePDF() {
+    window.print();
+}
+</script>
+
 {% endblock %}

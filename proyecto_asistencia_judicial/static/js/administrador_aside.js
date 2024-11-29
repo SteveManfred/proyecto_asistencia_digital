@@ -23,111 +23,50 @@ function loadSection(section) {
             </form>
         </div>`;
     } else if (section === "admin_cases") {
-    // Mostrar todos los casos
-    mainContent.innerHTML = `
-    <div class="container mt-1">
-        <h2 style="font-weight: bold">Mis casos</h2>
-        </br>
-        <div class="search-container">
-            <input type="text" id="searchInput" class="form-control" placeholder="Buscar casos..." onkeyup="searchCases()">
-        </div>
-        </br>
-        <div class="table-responsive">
-            <table class="table text-center">
-                <thead>
-                    <tr>
-                        <th>Fecha de Registro</th>
-                        <th>Tipo de Conflicto</th>
-                        <th>Tienda</th>
-                        <th>Método</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="casos-tbody">
-                    <tr>
-                        <td colspan="5" class="text-center">Cargando casos...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>`;
-
-    // Hacer la solicitud para obtener todos los casos
-    fetch('/api/casos/')
-        .then(response => response.json())
-        .then(casos => {
-            const tbody = document.getElementById('casos-tbody');
-            if (casos.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="text-center">No hay casos registrados</td>
-                    </tr>`;
-                return;
-            }
-
-            tbody.innerHTML = casos.map(caso => `
-                <tr>
-                    <td>${formatDate(caso.created_at)}</td>
-                    <td>${caso.conflict_type}</td>
-                    <td>${caso.store_name}</td>
-                    <td>${formatAcquisitionMethod(caso.acquisition_method)}</td>
-                    <td>
-                        <div>
-                            <button onclick="verCaso(${caso.id})" class="btn btn-primary btn-sm" aria-label="Ver caso">
-                                <i class="fa fa-eye fa-lg" aria-hidden="true"></i>
-                            </button>
-                            <button onclick="eliminarCaso(${caso.id})" class="btn btn-danger btn-sm" aria-label="Eliminar caso">
-                                <i class="fa fa-trash fa-lg" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        })
-        .catch(error => {
-            console.error('Error al cargar los casos:', error);
-            document.getElementById('casos-tbody').innerHTML = `
-                <tr>
-                    <td colspan="5" class="text-center text-danger">
-                        Error al cargar los casos. Por favor, intente nuevamente.
-                    </td>
-                </tr>`;
-        });
-} else if (section === "admin_all-cases") {
-            mainContent.innerHTML = `
-            <div class="container mt-1">
-                <h2 style="font-weight: bold">Todos los Casos</h2>
-                </br>
-                <div class="search-container">
-                    <input type="text" id="searchInput" class="form-control" placeholder="Buscar casos..." onkeyup="searchCases()">
-                </div>
-                </br>
-                <div class="table-responsive">
-                    <table class="table text-center">
-                        <thead>
-                            <tr>
-                                <th>Fecha de Registro</th>
-                                <th>Rut</th>
-                                <th>Tipo de Conflicto</th>
-                                <th>Tienda</th>
-                                <th>Método</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="casos-tbody">
-                            <tr>
-                                <td colspan="5" class="text-center">Cargando casos...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>`;
-
-            // Hacer la solicitud para obtener todos los casos
-            fetch('/api/todos_los_casos/')
+        mainContent.innerHTML = `
+        <div class="container mt-1">
+            <h2 style="font-weight: bold">Mis casos</h2>
+            </br>
+            <div class="search-container">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar casos..." onkeyup="searchCases()">
+            </div>
+            </br>
+            <div class="table-responsive">
+                <table class="table text-center">
+                    <thead>
+                        <tr>
+                            <th>Fecha de Registro</th>
+                            <th>Tipo de Conflicto</th>
+                            <th>Tienda</th>
+                            <th>Método</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="casos-tbody">
+                        <tr>
+                            <td colspan="5" class="text-center">Cargando casos...</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div id="pagination-container"></div>
+            </div>
+        </div>`;
+    
+        let currentPage = 1;
+        const itemsPerPage = 6;
+    
+        function renderCases(page) {
+            fetch('/api/casos/')
                 .then(response => response.json())
                 .then(casos => {
                     const tbody = document.getElementById('casos-tbody');
+                    const paginationContainer = document.getElementById('pagination-container');
+                    
+                    // Calcular los casos para la página actual
+                    const startIndex = (page - 1) * itemsPerPage;
+                    const endIndex = startIndex + itemsPerPage;
+                    const paginatedCases = casos.slice(startIndex, endIndex);
+    
                     if (casos.length === 0) {
                         tbody.innerHTML = `
                             <tr>
@@ -135,8 +74,109 @@ function loadSection(section) {
                             </tr>`;
                         return;
                     }
-
-                    tbody.innerHTML = casos.map(caso => `
+    
+                    tbody.innerHTML = paginatedCases.map(caso => `
+                        <tr>
+                            <td>${formatDate(caso.created_at)}</td>
+                            <td>${caso.conflict_type}</td>
+                            <td>${caso.store_name}</td>
+                            <td>${formatAcquisitionMethod(caso.acquisition_method)}</td>
+                            <td>
+                                <div>
+                                    <button onclick="verCaso(${caso.id})" class="btn btn-primary btn-sm" aria-label="Ver caso">
+                                        <i class="fa fa-eye fa-lg" aria-hidden="true"></i>
+                                    </button>
+                                    <button onclick="eliminarCaso(${caso.id})" class="btn btn-danger btn-sm" aria-label="Eliminar caso">
+                                        <i class="fa fa-trash fa-lg" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('');
+    
+                    // Limpiar contenedor de paginación
+                    paginationContainer.innerHTML = '';
+                    
+                    // Crear y agregar paginación
+                    const pagination = createPagination(
+                        casos.length, 
+                        itemsPerPage, 
+                        page, 
+                        (newPage) => {
+                            currentPage = newPage;
+                            renderCases(currentPage);
+                        }
+                    );
+                    paginationContainer.appendChild(pagination);
+                })
+                .catch(error => {
+                    console.error('Error al cargar los casos:', error);
+                    document.getElementById('casos-tbody').innerHTML = `
+                        <tr>
+                            <td colspan="5" class="text-center text-danger">
+                                Error al cargar los casos. Por favor, intente nuevamente.
+                            </td>
+                        </tr>`;
+                });
+        }
+    
+        // Renderizar la primera página
+        renderCases(currentPage);
+    } else if (section === "admin_all-cases") {
+        mainContent.innerHTML = `
+        <div class="container mt-1">
+            <h2 style="font-weight: bold">Todos los Casos</h2>
+            </br>
+            <div class="search-container">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar casos..." onkeyup="searchCases()">
+            </div>
+            </br>
+            <div class="table-responsive">
+                <table class="table text-center">
+                    <thead>
+                        <tr>
+                            <th>Fecha de Registro</th>
+                            <th>Rut</th>
+                            <th>Tipo de Conflicto</th>
+                            <th>Tienda</th>
+                            <th>Método</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="casos-tbody">
+                        <tr>
+                            <td colspan="6" class="text-center">Cargando casos...</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div id="pagination-container"></div>
+            </div>
+        </div>`;
+    
+        let currentPage = 1;
+        const itemsPerPage = 6;
+    
+        function renderCases(page) {
+            fetch('/api/todos_los_casos/')
+                .then(response => response.json())
+                .then(casos => {
+                    const tbody = document.getElementById('casos-tbody');
+                    const paginationContainer = document.getElementById('pagination-container');
+                    
+                    // Calcular los casos para la página actual
+                    const startIndex = (page - 1) * itemsPerPage;
+                    const endIndex = startIndex + itemsPerPage;
+                    const paginatedCases = casos.slice(startIndex, endIndex);
+    
+                    if (casos.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="6" class="text-center">No hay casos registrados</td>
+                            </tr>`;
+                        return;
+                    }
+    
+                    tbody.innerHTML = paginatedCases.map(caso => `
                         <tr>
                             <td>${formatDate(caso.created_at)}</td>
                             <td>${caso.rut_usuario}</td>
@@ -155,16 +195,35 @@ function loadSection(section) {
                             </td>
                         </tr>
                     `).join('');
+    
+                    // Limpiar contenedor de paginación
+                    paginationContainer.innerHTML = '';
+                    
+                    // Crear y agregar paginación
+                    const pagination = createPagination(
+                        casos.length, 
+                        itemsPerPage, 
+                        page, 
+                        (newPage) => {
+                            currentPage = newPage;
+                            renderCases(currentPage);
+                        }
+                    );
+                    paginationContainer.appendChild(pagination);
                 })
                 .catch(error => {
                     console.error('Error al cargar los casos:', error);
                     document.getElementById('casos-tbody').innerHTML = `
                         <tr>
-                            <td colspan="5" class="text-center text-danger">
+                            <td colspan="6" class="text-center text-danger">
                                 Error al cargar los casos. Por favor, intente nuevamente.
                             </td>
                         </tr>`;
                 });
+        }
+    
+        // Renderizar la primera página
+        renderCases(currentPage);
     } else if (section === "admin_new-case") {
         fetch('/consumidor/?section=new-case')
             .then(response => response.text())
@@ -279,12 +338,10 @@ function loadSection(section) {
                                 <td>Detalles de Conflicto:</td>
                                 <td>${resumen.detalles_conflicto.map(d => `${d.conflict_details}: ${d.count}`).join('<br>')}</td>
                             </tr>
-                            <!-- Repite para otros campos -->
                             <tr>
                                 <td>Tamaños de Producto:</td>
                                 <td>${resumen.tamanos_producto.map(p => `${p.product_size}: ${p.count}`).join('<br>')}</td>
                             </tr>
-                            <!-- Continúa con los otros campos -->
                         </table>
                     `;
                 };
@@ -339,7 +396,7 @@ function verCaso(casoId) {
 // Función para eliminar un caso
 function eliminarCaso(casoId) {
     if (confirm('¿Está seguro que desea eliminar este caso? Esta acción no se puede deshacer.')) {
-        // Mostrar indicador de carga
+
         const casosTbody = document.getElementById('casos-tbody');
         casosTbody.innerHTML = `<tr><td colspan="5" class="text-center">Eliminando...</td></tr>`;
         
@@ -351,7 +408,7 @@ function eliminarCaso(casoId) {
         })
         .then(response => {
             if (response.ok) {
-                loadSection('consumidor_cases');  // Recargar la lista de casos
+                loadSection('admin_cases' , 'admin_all-cases');
             } else {
                 throw new Error('Error al eliminar el caso');
             }
@@ -420,3 +477,36 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+// Función para agregar paginación
+function createPagination(totalItems, itemsPerPage, currentPage, onPageChange) {
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const paginationContainer = document.createElement('div');
+    paginationContainer.className = 'pagination justify-content-center mt-3';
+    
+    // Botón de página anterior
+    const prevButton = document.createElement('button');
+    prevButton.className = 'btn btn-secondary mr-2';
+    prevButton.textContent = 'Anterior';
+    prevButton.disabled = currentPage === 1;
+    prevButton.onclick = () => onPageChange(currentPage - 1);
+    
+    // Botón de página siguiente
+    const nextButton = document.createElement('button');
+    nextButton.className = 'btn btn-secondary ml-2';
+    nextButton.textContent = 'Siguiente';
+    nextButton.disabled = currentPage === totalPages;
+    nextButton.onclick = () => onPageChange(currentPage + 1);
+    
+    // Número de página actual
+    const pageInfo = document.createElement('span');
+    pageInfo.className = 'btn btn-light mx-2';
+    pageInfo.textContent = `Página ${currentPage} de ${totalPages}`;
+    
+    paginationContainer.appendChild(prevButton);
+    paginationContainer.appendChild(pageInfo);
+    paginationContainer.appendChild(nextButton);
+    
+    return paginationContainer;
+}
+

@@ -1,25 +1,25 @@
 #Mi views.py:
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from django.contrib.auth.models import User
-from django.contrib.auth import login, authenticate
-from django import forms
-from django.db import IntegrityError
-from .forms import NuevoCasoForm
-from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-from core.models import Caso
 from django.views.decorators.csrf import csrf_exempt
-import logging
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.db import IntegrityError
+from django.contrib import messages
 from django.db.models import Count
+from django.utils import timezone
+from .forms import NuevoCasoForm
+from meta_ai_api import MetaAI
+from datetime import timedelta
+from core.models import Caso
+from django import forms
+import logging
+import re
 from django.db.models.functions import Coalesce
 from django.db.models import Value
-from django.db.models import Count
 from django.db.models.functions import TruncMonth
-from django.utils import timezone
-from datetime import timedelta
-
 
 # Vista para el consumidor
 @login_required
@@ -43,7 +43,7 @@ class RegistroForm(forms.Form):
     email = forms.EmailField(label="Correo Electrónico")
     password = forms.CharField(label="Contraseña", widget=forms.PasswordInput)
     password_confirm = forms.CharField(label="Confirmar Contraseña", widget=forms.PasswordInput)
-    terms = forms.BooleanField(label="Acepto los términos y condiciones", required=True)
+    # terms = forms.BooleanField(label="Acepto los términos y condiciones", required=True)
 
 def registro_view(request):
     if request.method == "POST":
@@ -97,6 +97,7 @@ def custom_login_view(request):
 
 logger = logging.getLogger(__name__)
 
+# Vista para crear un nuevo caso
 @login_required
 def crear_caso(request):
     # Verifica si el usuario es un administrador o un consumidor
@@ -121,6 +122,9 @@ def crear_caso(request):
                 if 'documents' in request.FILES:
                     caso.documents = request.FILES['documents']
                     caso.save()
+                
+                # Llamar a la función que consulta la IA para obtener retroalimentación, predicciones y recomendaciones
+                consultar_ai(request, caso.id)
                 
                 messages.success(request, "El caso ha sido registrado exitosamente.")
                 return redirect('administrador' if request.user.is_staff else 'consumidor')  # Redirige según el rol del usuario
@@ -266,3 +270,119 @@ def dashboard_data(request):
 tipos_conflicto = Caso.objects.values('conflict_type')\
     .annotate(count=Count('id'))\
     .order_by('conflict_type')
+
+
+
+
+# Analisis de respuesta por IA
+logger = logging.getLogger(__name__)
+
+def consultar_ai(request, caso_id):
+    ai = MetaAI()
+    try:
+        caso = Caso.objects.get(id=caso_id)
+
+        # Crear el mensaje base común que se usará para todas las consultas
+        mensaje_base = f"""
+        **Detalles del Caso:**
+        - **Conflicto**: {caso.conflict_type}
+        - **Detalles del Conflicto**: {caso.conflict_details}
+        - **Tamaño del Producto**: {caso.product_size}
+        - **Condiciones de Compra**: {caso.purchase_conditions}
+        - **Respuesta de la Tienda**: {caso.store_response}
+        - **Expectativa de Resolución**: {caso.resolution_expectation}
+        - **Método de Adquisición**: {caso.acquisition_method}
+        - **Fecha de Compra**: {caso.purchase_date}
+        - **Nombre de la Tienda**: {caso.store_name}
+        - **Número de Pedido**: {caso.order_number}
+        - **Tienda Contactada**: {caso.contacted_store}
+        - **Fecha de Contacto**: {caso.contact_date if caso.contact_date else 'No especificada'}
+        - **Método de Contacto**: {caso.contact_method if caso.contact_method else 'No especificado'}
+        - **Detalles Adicionales**: {caso.additional_details if caso.additional_details else 'No disponibles'}
+        - **Documentos**: {caso.documents.url if caso.documents else 'No adjuntos'}
+        """
+
+        mensaje_retroalimentacion = mensaje_base + """
+        **Responde sin introducción , solo con una lista sobre las leyes (con numero de la ley) chilenas relacionadas con este caso, con un gran desglose por cada ley:**
+        1. **Retroalimentación de leyes relacionadas**:
+        """
+        mensaje_prediccion = mensaje_base + """
+        **Responde sin introducción, solo con una lista sobre la predicción de resultados y conclusiones:**
+        2. **Predicción de los resultados y conclusiones**:
+        """
+        mensaje_recomendaciones = mensaje_base + """
+        **Responde sin introducción, solo con una lista sobre las recomendaciones para este caso:**
+        3. **Recomendaciones**:
+        """
+
+        # Hacer las tres consultas a la IA
+        response_retroalimentacion = ai.prompt(message=mensaje_retroalimentacion)
+        response_prediccion = ai.prompt(message=mensaje_prediccion)
+        response_recomendaciones = ai.prompt(message=mensaje_recomendaciones)
+
+        # Obtener las respuestas de las tres consultas
+        retroalimentacion_leyes = response_retroalimentacion.get("message", "").strip() or "No se encontró retroalimentación legal."
+        prediccion_resultados = response_prediccion.get("message", "").strip() or "No se encontraron conclusiones."
+        recomendaciones = response_recomendaciones.get("message", "").strip() or "No se generaron recomendaciones."
+
+        # Eliminar los títulos de las secciones en las respuestas
+        retroalimentacion_leyes = retroalimentacion_leyes.replace("Retroalimentación de leyes relacionadas:", "").strip()
+        prediccion_resultados = prediccion_resultados.replace("Predicción de los resultados y conclusiones:", "").strip()
+        recomendaciones = recomendaciones.replace("Recomendaciones:", "").strip()
+
+        # Función para agregar saltos de línea después de cada punto de la respuesta
+        def procesar_respuesta(texto):
+            if texto:
+                
+                texto = texto.strip()
+
+                # Paso 1: Evitar que las leyes sean divididas por puntos.
+                texto = re.sub(r"(Ley \d{1,2}\.\d{1,3}[\s\)])", r"\1|", texto)
+                texto = re.sub(r"(Ley de [\w\s]+ \(Ley \d{1,2}\.\d{1,3}\))", r"\1|", texto)
+
+                # Paso 2: Eliminar el punto en las leyes que tienen números grandes.
+                texto = re.sub(r"(\d{1,2})\.(\d{3})", r"\1\2", texto) 
+
+                # Paso 3: Aplicar salto de línea después de puntos, solo si después del punto hay un espacio
+                texto = re.sub(r"(\.)(\s+)", r"\1<br>\2", texto)
+
+                # Paso 4: Dividir el texto en oraciones por cada punto.
+                lineas = [line.strip() + "." for line in texto.split(".") if line.strip()]
+
+                # Paso 5: Unir las líneas con saltos de línea (<br>) para HTML
+                texto_con_br = "<br>".join(lineas)
+
+                # Paso 6: Restaurar las leyes que hemos marcado con "|"
+                texto_con_br = texto_con_br.replace("|", " ")
+
+                return texto_con_br
+            
+            return ""
+
+        # Aplicar la función para separar por puntos y añadir saltos de línea
+        retroalimentacion_leyes = procesar_respuesta(retroalimentacion_leyes)
+        prediccion_resultados = procesar_respuesta(prediccion_resultados)
+        recomendaciones = procesar_respuesta(recomendaciones)
+
+        # Guardar la respuesta completa de la IA (sin títulos de secciones)
+        caso.full_ai_response = f"""
+        {retroalimentacion_leyes}
+
+        {prediccion_resultados}
+
+        {recomendaciones}
+        """
+
+        # Guardar las respuestas separadas en los campos correspondientes
+        caso.legal_feedback = retroalimentacion_leyes
+        caso.results_prediction = prediccion_resultados
+        caso.recommendations = recomendaciones
+
+        # Guardar el caso con toda la información actualizada
+        caso.save()
+
+    except Caso.DoesNotExist:
+        logger.error(f"El caso con ID {caso_id} no existe.")
+    except Exception as e:
+        logger.error(f"Error al consultar la IA para el caso {caso_id}: {e}")
+        

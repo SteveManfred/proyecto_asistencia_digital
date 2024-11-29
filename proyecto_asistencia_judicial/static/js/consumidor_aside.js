@@ -48,49 +48,80 @@ function loadSection(section) {
                         </tr>
                     </tbody>
                 </table>
+                <div id="pagination-container"></div>
             </div>
         </div>`;
 
-        // Luego hacemos la petición para obtener los casos
-        fetch('/api/casos/')
-            .then(response => response.json())
-            .then(casos => {
-                const tbody = document.getElementById('casos-tbody');
-                if (casos.length === 0) {
-                    tbody.innerHTML = `
+        let currentPage = 1;
+        const itemsPerPage = 6;
+    
+        function renderCases(page) {
+            fetch('/api/casos/')
+                .then(response => response.json())
+                .then(casos => {
+                    const tbody = document.getElementById('casos-tbody');
+                    const paginationContainer = document.getElementById('pagination-container');
+                    
+                    // Calcular los casos para la página actual
+                    const startIndex = (page - 1) * itemsPerPage;
+                    const endIndex = startIndex + itemsPerPage;
+                    const paginatedCases = casos.slice(startIndex, endIndex);
+    
+                    if (casos.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="5" class="text-center">No hay casos registrados</td>
+                            </tr>`;
+                        return;
+                    }
+    
+                    tbody.innerHTML = paginatedCases.map(caso => `
                         <tr>
-                            <td colspan="5" class="text-center">No hay casos registrados</td>
+                            <td>${formatDate(caso.created_at)}</td>
+                            <td>${caso.conflict_type}</td>
+                            <td>${caso.store_name}</td>
+                            <td>${formatAcquisitionMethod(caso.acquisition_method)}</td>
+                            <td>
+                                <div>
+                                    <button onclick="verCaso(${caso.id})" class="btn btn-primary btn-sm" aria-label="Ver caso">
+                                        <i class="fa fa-eye fa-lg" aria-hidden="true"></i>
+                                    </button>
+                                    <button onclick="eliminarCaso(${caso.id})" class="btn btn-danger btn-sm" aria-label="Eliminar caso">
+                                        <i class="fa fa-trash fa-lg" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('');
+    
+                    // Limpiar contenedor de paginación
+                    paginationContainer.innerHTML = '';
+                    
+                    // Crear y agregar paginación
+                    const pagination = createPagination(
+                        casos.length, 
+                        itemsPerPage, 
+                        page, 
+                        (newPage) => {
+                            currentPage = newPage;
+                            renderCases(currentPage);
+                        }
+                    );
+                    paginationContainer.appendChild(pagination);
+                })
+                .catch(error => {
+                    console.error('Error al cargar los casos:', error);
+                    document.getElementById('casos-tbody').innerHTML = `
+                        <tr>
+                            <td colspan="5" class="text-center text-danger">
+                                Error al cargar los casos. Por favor, intente nuevamente.
+                            </td>
                         </tr>`;
-                    return;
-                }
-                tbody.innerHTML = casos.map(caso => `
-                    <tr>
-                        <td>${formatDate(caso.created_at)}</td>
-                        <td>${caso.conflict_type}</td>
-                        <td>${caso.store_name}</td>
-                        <td>${formatAcquisitionMethod(caso.acquisition_method)}</td>
-                        <td>
-                            <div>
-                                <button onclick="verCaso(${caso.id})" class="btn btn-primary btn-sm" aria-label="Ver caso">
-                                    <i class="fa fa-eye fa-lg" aria-hidden="true"></i>
-                                </button>
-                                <button onclick="eliminarCaso(${caso.id})" class="btn btn-danger btn-sm" aria-label="Eliminar caso">
-                                    <i class="fa fa-trash fa-lg" aria-hidden="true"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `).join('');
-            })
-            .catch(error => {
-                console.error('Error al cargar los casos:', error);
-                document.getElementById('casos-tbody').innerHTML = `
-                    <tr>
-                        <td colspan="5" class="text-center text-danger">
-                            Error al cargar los casos. Por favor, intente nuevamente.
-                        </td>
-                    </tr>`;
-            });
+                });
+        }
+    
+        // Renderizar la primera página
+        renderCases(currentPage);
     } else if (section === "consumidor_new-case") {
         fetch('/consumidor/?section=new-case')
             .then(response => response.text())
@@ -178,7 +209,6 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// Función para buscar casos
 let debounceTimeout;
 function searchCases() {
     const input = document.getElementById('searchInput');
@@ -188,6 +218,7 @@ function searchCases() {
     clearTimeout(debounceTimeout);
 
     debounceTimeout = setTimeout(() => {
+        let visibleRowsCount = 0;
         rows.forEach(row => {
             const cells = row.getElementsByTagName('td');
             let match = false;
@@ -198,7 +229,58 @@ function searchCases() {
                     break;
                 }
             }
-            row.style.display = match ? '' : 'none';
+            
+            if (match) {
+                row.style.display = '';
+                visibleRowsCount++;
+            } else {
+                row.style.display = 'none';
+            }
         });
+
+        // Mostrar mensaje si no hay resultados
+        const noResultsRow = document.querySelector('#casos-tbody .no-results');
+        if (visibleRowsCount === 0) {
+            if (!noResultsRow) {
+                const tr = document.createElement('tr');
+                tr.className = 'no-results';
+                tr.innerHTML = `<td colspan="5" class="text-center">No se encontraron resultados</td>`;
+                document.getElementById('casos-tbody').appendChild(tr);
+            }
+        } else if (noResultsRow) {
+            noResultsRow.remove();
+        }
     }, 300);
 }
+
+    // Función para crear paginación
+    function createPagination(totalItems, itemsPerPage, currentPage, onPageChange) {
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        const paginationContainer = document.createElement('div');
+        paginationContainer.className = 'pagination justify-content-center mt-3';
+        
+        // Botón de página anterior
+        const prevButton = document.createElement('button');
+        prevButton.className = 'btn btn-secondary mr-2';
+        prevButton.textContent = 'Anterior';
+        prevButton.disabled = currentPage === 1;
+        prevButton.onclick = () => onPageChange(currentPage - 1);
+        
+        // Botón de página siguiente
+        const nextButton = document.createElement('button');
+        nextButton.className = 'btn btn-secondary ml-2';
+        nextButton.textContent = 'Siguiente';
+        nextButton.disabled = currentPage === totalPages;
+        nextButton.onclick = () => onPageChange(currentPage + 1);
+        
+        // Número de página actual
+        const pageInfo = document.createElement('span');
+        pageInfo.className = 'btn btn-light mx-2';
+        pageInfo.textContent = `Página ${currentPage} de ${totalPages}`;
+        
+        paginationContainer.appendChild(prevButton);
+        paginationContainer.appendChild(pageInfo);
+        paginationContainer.appendChild(nextButton);
+        
+        return paginationContainer;
+    }

@@ -46,9 +46,9 @@
                 <label for="conflict_details">¿Qué sucedió exactamente?</label>
                 <select class="form-select" name="conflict_details" id="conflict_details" required>
                     <option value="">Seleccione una opción</option>
-                    <option value="defectuoso">El producto llegó defectuoso</option>
-                    <option value="sin_entrega">No se realizó la entrega</option>
-                    <option value="no_prometido">El servicio no fue el prometido</option>
+                    <option value="El producto llegó defectuoso">El producto llegó defectuoso</option>
+                    <option value="No se realizó la entrega">No se realizó la entrega</option>
+                    <option value="El servicio no fue el prometido">El servicio no fue el prometido</option>
                     <option value="otro">Otro</option>
                 </select>
             </div>
@@ -57,10 +57,10 @@
                 <label for="product_size">¿De qué tamaño es el producto?</label>
                 <select class="form-select" name="product_size" id="product_size" required>
                     <option value="">Seleccione una opción</option>
-                    <option value="muy_grande">Muy Grande</option>
-                    <option value="grande">Grande</option>
-                    <option value="mediano">Mediano</option>
-                    <option value="chico">Chico</option>
+                    <option value="Muy Grande">Muy Grande</option>
+                    <option value="Grande">Grande</option>
+                    <option value="Mediano">Mediano</option>
+                    <option value="Chico">Chico</option>
                 </select>
             </div>
         
@@ -68,9 +68,9 @@
                 <label for="purchase_conditions">¿Cuáles fueron las condiciones de compra?</label>
                 <select class="form-select" name="purchase_conditions" id="purchase_conditions" required>
                     <option value="">Seleccione una opción</option>
-                    <option value="oferta">Compré con una oferta/promoción</option>
-                    <option value="precio_normal">Compré a precio normal</option>
-                    <option value="no_sabe">No estoy seguro</option>
+                    <option value="Precio oferta/promoción">Compré con una oferta/promoción</option>
+                    <option value="Precio normal">Compré a precio normal</option>
+                    <option value="No sabe">No estoy seguro</option>
                 </select>
             </div>
         
@@ -78,9 +78,9 @@
                 <label for="store_response">¿Has recibido alguna respuesta de la tienda?</label>
                 <select class="form-select" name="store_response" id="store_response" required>
                     <option value="">Seleccione una opción</option>
-                    <option value="solucion_satisfactoria">Sí, solución satisfactoria</option>
-                    <option value="respuesta_insatisfactoria">Sí, respuesta insatisfactoria</option>
-                    <option value="no_respuesta">No, no he recibido respuesta</option>
+                    <option value="Solucion satisfactoria">Sí, solución satisfactoria, pero...</option>
+                    <option value="Respuesta Insatisfactoria">Sí, respuesta insatisfactoria</option>
+                    <option value="No hubo respuesta">No, no he recibido respuesta</option>
                 </select>
             </div>
         
@@ -88,9 +88,9 @@
                 <label for="resolution_expectation">¿Cuál es tu expectativa de resolución?</label>
                 <select class="form-select" name="resolution_expectation" id="resolution_expectation" required>
                     <option value="">Seleccione una opción</option>
-                    <option value="reembolso">Reembolso completo</option>
-                    <option value="reemplazo">Reemplazo del producto</option>
-                    <option value="credito">Crédito en la tienda</option>
+                    <option value="Reembolso completo">Reembolso completo</option>
+                    <option value="Reemplazo del producto">Reemplazo del producto</option>
+                    <option value="Crédito en la tienda">Crédito en la tienda</option>
                 </select>
             </div>
             </br>
@@ -100,8 +100,8 @@
             <div class="mb-3">
                 <label>Método de Adquisición</label>
                 <select class="form-select" name="acquisition_method" required>
-                    <option value="online">Online</option>
-                    <option value="presencial">Presencial</option>
+                    <option value="Online">Online</option>
+                    <option value="Presencial">Presencial</option>
                 </select>
             </div>
             <div class="mb-3">
@@ -123,8 +123,8 @@
             <div class="mb-3">
                 <label>¿Se comunicó con la tienda?</label>
                 <select class="form-select" name="contacted_store">
-                    <option value="no">No</option>
-                    <option value="si">Si</option>
+                    <option value="No">No</option>
+                    <option value="Si">Si</option>
                 </select>
             </div>
             <div class="mb-3">
@@ -135,26 +135,26 @@
                 <label>Método de contacto</label>
                 <select class="form-select" name="contact_method">
                     <option value="">Seleccione una opción</option>
-                    <option value="presencial">Presencial</option>
-                    <option value="llamada">Llamada telefónica</option>
-                    <option value="correo">Correo electrónico</option>
-                    <option value="chat">Chat en línea</option>
+                    <option value="Presencial">Presencial</option>
+                    <option value="Llamada telefonica">Llamada telefónica</option>
+                    <option value="Correo Electronico">Correo electrónico</option>
+                    <option value="Chat">Chat en línea</option>
                 </select>
             </div>
             </br>
         
             <!-- Sección 5: Información adicional -->
-            <h3>Información adicional</h3>
+            <h3>Información adicional (Opcional)</h3>
             <div class="mb-3">
-                <label>Detalles adicionales</label>
+                <label>Detalles adicionales que pueden relatar el caso</label>
                 <textarea class="form-control" name="additional_details" rows="3"></textarea>
             </div>
             </br>
         
             <!-- Sección 6: Adjuntar documentos -->
-            <h3>Adjuntar documentos</h3>
+            <h3>Adjuntar documentos (Opcional)</h3>
             <div class="mb-3">
-                <label>Adjuntar documentos o imágenes (máximo 2)</label>
+                <label>Adjuntar documentos o imágenes como evidiencia (máximo 2)</label>
                 <input type="file" class="form-control" name="documents" multiple>
             </div>
             </br>
