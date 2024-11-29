@@ -9,7 +9,7 @@ El proyecto se concibe como una iniciativa con un modelo de propuesta cuyo objet
 - Clonar el repositorio en su PC.
 `git clone https://github.com/SteveManfred/proyecto_asistencia_digital.git`
 - Creación del Entorno Virtual > Miniconda.
-`conda create -n entorno-litigio`  
+`conda create -n entorno-litigio python=3.10`  
 - Activación:
 `conda activate entorno-litigio`  
 - Instalación de requerimientos.
