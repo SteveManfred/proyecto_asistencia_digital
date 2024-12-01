@@ -11,9 +11,11 @@ idna==3.10
 importlib_metadata==8.5.0
 lxml==5.3.0
 lxml_html_clean==0.4.1
+meta_ai_api==1.2.5
 parse==1.20.2
 psycopg2==2.9.10
 pyee==11.1.1
+pyppeteer==2.0.0
 pyquery==2.0.1
 requests==2.32.3
 requests-html==0.10.0
@@ -22,6 +24,7 @@ sqlparse==0.5.1
 tqdm==4.67.1
 typing_extensions==4.12.2
 tzdata==2024.2
+urllib3==1.26.20
 w3lib==2.2.1
 websockets==10.4
 wheel==0.44.0
